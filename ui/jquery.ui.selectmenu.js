@@ -170,7 +170,18 @@ $.widget("ui.selectmenu", {
 
 		// set width when not set via options
 		if (!o.width) {
-			o.width = this.element.outerWidth();
+			 if (this.element.is(':visible')){
+				o.width = this.element.outerWidth();
+		         } else { //try to get width from computed style
+				o.width = this._getRealComputedStyle(this.element[0],'width');
+				//there is no defined width
+				if (o.width=='auto'){
+				 var e2=this.element.clone().hide().appendTo('body');
+				 o.width=e2.outerWidth();
+				 e2.remove();
+				 e2=null;
+				}
+		         }
 		}
 		// set menu button width
 		this.newelement.width(o.width);
@@ -840,6 +851,14 @@ $.widget("ui.selectmenu", {
 			collision: o.positionOptions.collision || 'flip'
 		});
 	}
+	 _getRealComputedStyle:function(el, cssprop){
+	       if (el.currentStyle) //IE
+	        	return el.currentStyle[cssprop]
+	       else if (document.defaultView && document.defaultView.getComputedStyle) //Firefox
+	        	return document.defaultView.getComputedStyle(el, "")[cssprop]
+	       else //try and get inline style
+	        	return el.style[cssprop]
+       },
 });
 
 })(jQuery);
